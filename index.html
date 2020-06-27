@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Руки Вверх! - Алёшка</title>
+        <meta name="description" content="Piano chords applicature generator"/>
+        <style>
+            body {
+                font-family: Roboto, Arial, sans-serif;
+            }
+            .chordWrapper {
+                position: relative;
+            }
+            .blackKeysWrapper {
+                position: absolute;
+                top:0;
+                padding-left: 16px;
+                display: flex;
+                flex-direction: row;
+            }
+
+            .whiteKeysWrapper {
+                display: flex;
+                flex-direction: row;
+            }
+
+            .whiteKey {
+                background-color: white;
+                border-left: 1px solid black;
+                width: 21px;
+                height: 110px;
+                position: relative;
+                box-shadow:  inset 0px 5px 5px 0px rgba(0,0,0,0.2);
+                border-bottom-left-radius: 2px;
+                border-bottom-right-radius: 2px;
+            }
+
+            .blackKey {
+                background-color: black;
+                width: 12px;
+                height: 56px;
+                border-bottom-left-radius: 2px;
+                border-bottom-right-radius: 2px;
+                margin-right:10px;
+            }
+
+            .hidden {
+                visibility: hidden;
+            }
+
+            .press {
+                box-shadow:  inset 2.5px 5px 5px 0px rgba(0,0,0,0.2);
+            }
+
+            .right {
+                background-color: rgb(115,150,191);
+            }
+
+            .left {
+                background-color: rgb(97,179,64);
+            }
+
+            .whiteKey.press::after {
+                content: attr(data-finger);
+                display: block;
+                position: absolute;
+                bottom: 10px;
+                width: 100%;
+                text-align: center;
+            }
+
+            .whiteKey:not(.press)::after {
+                content: '';
+                display: block;
+                position: absolute;
+                bottom: 0;
+                height: 10px;
+                width: 100%;
+                box-shadow:  inset 0px 10px 5px 0px rgba(0,0,0,0.5);
+                border-bottom-left-radius: 2px;
+                border-bottom-right-radius: 2px;
+            }
+
+            .pianoChordWrapper {
+                margin-bottom: 20px;
+            }
+
+            .pionoChordWrapperTitle {
+                font-weight: 400;
+                line-height: 2.4rem;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script>
+            let note;
+            function createKey(el, type, index, info = null) {
+                const key = document.createElement('div');
+                key.dataset.key = index;
+                key.classList.add(type);
+
+                if (type === 'blackKey') {
+                    note++;
+                    if (note > 7) {
+                        note = 1;
+                    }
+
+                    if (note == 3 || note == 7) {
+                        key.classList.add('hidden');
+                    }
+                }
+
+                if (info) {
+                    const { hand, finger } = info;
+                    key.dataset.finger = finger;
+                    key.classList.add(hand, 'press');
+                }
+
+                el.appendChild(key);
+            }
+
+            function createPianoСhord(el, info, oktaves = 4) {
+                const chordWrapper = document.createElement('div');
+                chordWrapper.classList.add('chordWrapper');
+
+                const whiteKeysWrapper = document.createElement('div');
+                whiteKeysWrapper.classList.add('whiteKeysWrapper');
+
+                const blackKeysWrapper = document.createElement('div');
+                blackKeysWrapper.classList.add('blackKeysWrapper');
+
+                note = 0;
+                for (let i=0; i < 7*oktaves; i++) {
+                    createKey(whiteKeysWrapper, 'whiteKey', i, i in info ? info[i] : null);
+                }
+
+                note = 0;
+                for (let j=7*oktaves; j < 7*oktaves + 7*oktaves; j++) {
+                    createKey(blackKeysWrapper, 'blackKey', j, j in info ? info[j] : null);
+                }
+
+                chordWrapper.appendChild(whiteKeysWrapper);
+                chordWrapper.appendChild(blackKeysWrapper);
+                el.appendChild(chordWrapper);
+            }
+
+            function createPianoChordWrapper(el, chord, info) {
+                const pianoChordWrapper = document.createElement('div');
+                pianoChordWrapper.classList.add('pianoChordWrapper');
+
+                const pionoChordWrapperTitle = document.createElement('div');
+                pionoChordWrapperTitle.classList.add('pionoChordWrapperTitle');
+                pionoChordWrapperTitle.innerHTML = chord;
+                pianoChordWrapper.appendChild(pionoChordWrapperTitle);
+
+                createPianoСhord(pianoChordWrapper, info);
+                el.appendChild(pianoChordWrapper);
+            }
+
+            const root = document.getElementById('root');
+
+            // Руки Вверх! - Алёшка
+            const chords = {
+                'Am <sup>add 9</sup>': {
+                    5: {hand: 'left', finger: 5},
+                    9: {hand: 'left', finger: 2},
+                    12: {hand: 'left', finger: 1},
+                    13: {hand: 'right', finger: 2},
+                    14: {hand: 'right', finger: 3},
+                    16: {hand: 'right', finger: 5}
+                },
+                'G <sup>6</sup>': {
+                    4: {hand: 'left', finger: 5},
+                    9: {hand: 'left', finger: 1},
+                    11: {hand: 'right', finger: 1},
+                    13: {hand: 'right', finger: 2},
+                    16: {hand: 'right', finger: 5}
+                },
+                'F <sup>maj7/9</sup>': {
+                    3: {hand: 'left', finger: 5},
+                    7: {hand: 'left', finger: 3},
+                    11: {hand: 'left', finger: 1},
+                    12: {hand: 'right', finger: 1},
+                    14: {hand: 'right', finger: 2},
+                    16: {hand: 'right', finger: 4}
+                },
+                'Em <sup>7</sup>': {
+                    2: {hand: 'left', finger: 5},
+                    9: {hand: 'left', finger: 1},
+                    11: {hand: 'right', finger: 1},
+                    13: {hand: 'right', finger: 2},
+                    15: {hand: 'right', finger: 4},
+                    16: {hand: 'right', finger: 5},
+                }
+            }
+            for (var chord in chords) {
+                createPianoChordWrapper(root, chord, chords[chord]);
+            }
+        </script>
+    </body>
+</html>
